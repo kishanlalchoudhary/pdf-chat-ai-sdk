@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     const streamingTextResponse = callChain({
       question,
       chatHistory: formattedPreviousMessages.join("\n"),
+      user: (Math.random() + 1).toString(36).substring(7),
     });
 
     return streamingTextResponse;

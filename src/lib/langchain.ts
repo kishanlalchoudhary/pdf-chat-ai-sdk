@@ -6,15 +6,20 @@ import {
   experimental_StreamData,
   LangChainStream,
 } from "ai-stream-experimental";
-import { streamingModel, nonStreamingModel } from "./llm";
+import { createStreamingModel, createNonStreamingModel } from "./llm";
 import { STANDALONE_QUESTION_TEMPLATE, QA_TEMPLATE } from "./prompt-templates";
 
 type callChainArgs = {
   question: string;
   chatHistory: string;
+  user: string;
 };
 
-export async function callChain({ question, chatHistory }: callChainArgs) {
+export async function callChain({
+  question,
+  chatHistory,
+  user,
+}: callChainArgs) {
   try {
     const sanitizedQuestion = question.trim().replaceAll("\n", " ");
     const pineconeClient = await getPineconeClient();
@@ -23,6 +28,8 @@ export async function callChain({ question, chatHistory }: callChainArgs) {
       experimental_streamData: true,
     });
     const data = new experimental_StreamData();
+    const streamingModel = createStreamingModel(user);
+    const nonStreamingModel = createNonStreamingModel(user);
 
     const chain = ConversationalRetrievalQAChain.fromLLM(
       streamingModel,
